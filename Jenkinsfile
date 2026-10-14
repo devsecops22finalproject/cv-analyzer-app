@@ -29,6 +29,20 @@ pipeline {
             }
         }
 
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker run --rm \
+                      -v jenkins_home:/jenkins_home \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      -w "/jenkins_home/workspace/$JOB_NAME" \
+                      docker:29-cli \
+                      sh -c "docker build -t cv-analyzer-backend:latest ./backend && docker build -t cv-analyzer-frontend:latest ./frontend"
+                '''
+            }
+        }
+
         stage('Verify') {
             steps {
                 sh 'ls -la'
