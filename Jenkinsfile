@@ -20,6 +20,15 @@ pipeline {
             }
         }
 
+
+        stage('Automated Tests') {
+            steps {
+                sh '''
+                    docker run --rm                       -v "$WORKSPACE/backend:/app"                       -w /app                       python:3.11-slim                       sh -c "pip install -q -r requirements.txt && python -m pytest tests/ -v"
+                '''
+            }
+        }
+
         stage('Verify') {
             steps {
                 sh 'ls -la'
