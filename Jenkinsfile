@@ -24,7 +24,7 @@ pipeline {
         stage('Automated Tests') {
             steps {
                 sh '''
-                    docker run --rm                       -v "$WORKSPACE/backend:/app"                       -w /app                       python:3.11-slim                       sh -c "pip install -q -r requirements.txt && python -m pytest tests/ -v"
+                    docker run --rm                       -v jenkins_home:/jenkins_home -w "/jenkins_home/workspace/$JOB_NAME/backend"                                              python:3.11-slim                       sh -c "pip install -q -r requirements.txt && python -m pytest tests/ -v"
                 '''
             }
         }
