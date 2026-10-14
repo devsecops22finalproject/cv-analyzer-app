@@ -64,6 +64,27 @@ pipeline {
             }
         }
 
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    export KUBECONFIG=/var/jenkins_home/kubeconfig
+
+                    kubectl -n job-screener set image deployment/backend backend=eliaor360/cv-analyzer-backend:latest
+                    kubectl -n job-screener set image deployment/frontend frontend=eliaor360/cv-analyzer-frontend:latest
+
+                    kubectl -n job-screener patch deployment backend --type=strategic -p '{"spec":{"template":{"spec":{"containers":[{"name":"backend","imagePullPolicy":"Always"}]}}}}'
+                    kubectl -n job-screener patch deployment frontend --type=strategic -p '{"spec":{"template":{"spec":{"containers":[{"name":"frontend","imagePullPolicy":"Always"}]}}}}'
+
+                    kubectl -n job-screener rollout restart deployment/backend
+                    kubectl -n job-screener rollout restart deployment/frontend
+
+                    kubectl -n job-screener rollout status deployment/backend --timeout=300s
+                    kubectl -n job-screener rollout status deployment/frontend --timeout=300s
+                '''
+            }
+        }
+
         stage('Verify') {
             steps {
                 sh 'ls -la'
