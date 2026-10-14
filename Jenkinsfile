@@ -9,6 +9,17 @@ pipeline {
             }
         }
 
+
+        stage('Checkout Infrastructure') {
+            steps {
+                dir('infrastructure') {
+                    git branch: 'main',
+                        url: 'https://github.com/devsecops22finalproject/cv-analyzer-infra.git'
+                    sh 'ls -la'
+                }
+            }
+        }
+
         stage('Verify') {
             steps {
                 sh 'ls -la'
