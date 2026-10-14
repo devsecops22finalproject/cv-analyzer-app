@@ -43,6 +43,27 @@ pipeline {
             }
         }
 
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_TOKEN'
+                )]) {
+                    sh '''
+                        set +x
+                        echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag cv-analyzer-backend:latest "$DOCKER_USER/cv-analyzer-backend:latest"
+                        docker tag cv-analyzer-frontend:latest "$DOCKER_USER/cv-analyzer-frontend:latest"
+                        docker push "$DOCKER_USER/cv-analyzer-backend:latest"
+                        docker push "$DOCKER_USER/cv-analyzer-frontend:latest"
+                        docker logout
+                    '''
+                }
+            }
+        }
+
         stage('Verify') {
             steps {
                 sh 'ls -la'
